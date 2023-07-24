@@ -409,7 +409,7 @@ func Annotations(spec v1.SpecInterface, clusterAnnotations map[string]string, no
 
 func PodSecurityContext(spec v1.SpecInterface) *corev1.PodSecurityContext {
 	onRootMismatch := corev1.FSGroupChangeOnRootMismatch
-	group := int64(1000)
+	group := int64(1000610000)
 	if spec.GetFsGroup() == nil {
 		sc := &corev1.PodSecurityContext{
 			FSGroupChangePolicy: &onRootMismatch,
@@ -427,8 +427,8 @@ func PodSecurityContext(spec v1.SpecInterface) *corev1.PodSecurityContext {
 }
 
 func ContainerSecurityContext() *corev1.SecurityContext {
-	user := int64(1000)
-	group := int64(1000)
+	user := int64(1000610000)
+	group := int64(1000610000)
 	return &corev1.SecurityContext{
 		RunAsNonRoot:             func() *bool { b := true; return &b }(),
 		RunAsUser:                &user,
