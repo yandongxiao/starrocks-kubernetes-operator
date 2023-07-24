@@ -409,14 +409,17 @@ func Annotations(spec v1.SpecInterface, clusterAnnotations map[string]string, no
 
 func PodSecurityContext(spec v1.SpecInterface) *corev1.PodSecurityContext {
 	onRootMismatch := corev1.FSGroupChangeOnRootMismatch
+	group := int64(1000)
 	if spec.GetFsGroup() == nil {
 		sc := &corev1.PodSecurityContext{
 			FSGroupChangePolicy: &onRootMismatch,
+			FSGroup:             &group,
 		}
 		return sc
 	} else if *(spec.GetFsGroup()) != 0 {
 		sc := &corev1.PodSecurityContext{
 			FSGroupChangePolicy: &onRootMismatch,
+			FSGroup:             &group,
 		}
 		return sc
 	}
@@ -424,8 +427,12 @@ func PodSecurityContext(spec v1.SpecInterface) *corev1.PodSecurityContext {
 }
 
 func ContainerSecurityContext() *corev1.SecurityContext {
+	user := int64(1000)
+	group := int64(1000)
 	return &corev1.SecurityContext{
 		RunAsNonRoot:             func() *bool { b := true; return &b }(),
+		RunAsUser:                &user,
+		RunAsGroup:               &group,
 		AllowPrivilegeEscalation: func() *bool { b := false; return &b }(),
 		// starrocks will create pid file, eg.g /opt/starrocks/fe/bin/fe.pid, so set it to false
 		ReadOnlyRootFilesystem: func() *bool { b := false; return &b }(),
