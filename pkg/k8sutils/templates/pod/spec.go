@@ -411,14 +411,12 @@ func PodSecurityContext(spec v1.SpecInterface) *corev1.PodSecurityContext {
 	onRootMismatch := corev1.FSGroupChangeOnRootMismatch
 	if spec.GetFsGroup() == nil {
 		sc := &corev1.PodSecurityContext{
-			FSGroup:             rutils.GetInt64ptr(1000), // the starrocks user id is 1000
 			FSGroupChangePolicy: &onRootMismatch,
 		}
 		return sc
 	} else if *(spec.GetFsGroup()) != 0 {
 		sc := &corev1.PodSecurityContext{
 			FSGroupChangePolicy: &onRootMismatch,
-			FSGroup:             spec.GetFsGroup(),
 		}
 		return sc
 	}
@@ -427,11 +425,9 @@ func PodSecurityContext(spec v1.SpecInterface) *corev1.PodSecurityContext {
 
 func ContainerSecurityContext() *corev1.SecurityContext {
 	return &corev1.SecurityContext{
+		RunAsNonRoot:             func() *bool { b := true; return &b }(),
 		AllowPrivilegeEscalation: func() *bool { b := false; return &b }(),
 		// starrocks will create pid file, eg.g /opt/starrocks/fe/bin/fe.pid, so set it to false
 		ReadOnlyRootFilesystem: func() *bool { b := false; return &b }(),
-		SeccompProfile: &corev1.SeccompProfile{
-			Type: corev1.SeccompProfileTypeUnconfined,
-		},
 	}
 }
