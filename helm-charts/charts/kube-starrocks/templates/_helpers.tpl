@@ -78,21 +78,21 @@ starrockscluster
 {{- define "starrockscluster.fe.config" -}}
 fe.conf: |
 {{- if .Values.starrocksFESpec.config }}
-{{ .Values.starrocksFESpec.config | indent 2 }}
+{{ tpl (.Values.starrocksFESpec.config | toYaml) . | indent 2 }}
 {{- end }}
 {{- end }}
 
 {{- define "starrockscluster.cn.config" -}}
 cn.conf: |
 {{- if .Values.starrocksCnSpec.config | indent 2 }}
-{{ .Values.starrocksCnSpec.config | indent 2 }}
+{{ tpl (.Values.starrocksCnSpec.config | toYaml) . | indent 2 }}
 {{- end }}
 {{- end }}
 
 {{- define "starrocksclster.be.config" -}}
 be.conf: |
 {{- if .Values.starrocksBeSpec.config | indent 2 }}
-{{ .Values.starrocksBeSpec.config | indent 2 }}
+{{ tpl (.Values.starrocksBeSpec.config | toYaml) . | indent 2 }}
 {{- end }}
 {{- end }}
 

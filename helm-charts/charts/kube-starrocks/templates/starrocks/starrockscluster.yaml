@@ -22,19 +22,29 @@ spec:
     {{- else if .Values.starrocksFESpec.resource }}
     {{- toYaml .Values.starrocksFESpec.resource | nindent 4 }}
     {{- end }}
-{{- if .Values.starrocksFESpec.service.type }}
+    {{- if .Values.starrocksFESpec.service.type }}
     service:
       type: {{ .Values.starrocksFESpec.service.type }}
-{{- if and (eq "LoadBalancer" .Values.starrocksFESpec.service.type) .Values.starrocksFESpec.service.loadbalancerIP }}
+      {{- if and (eq "LoadBalancer" .Values.starrocksFESpec.service.type) .Values.starrocksFESpec.service.loadbalancerIP }}
       loadBalancerIP: {{ .Values.starrocksFESpec.service.loadbalancerIP }}
-{{- end }}
-{{- if .Values.starrocksFESpec.service.annotations }}
+      {{- end }}
+      {{- if or .Values.starrocksFESpec.service.annotations .Values.datadog.metrics.enabled }}
       annotations:
-{{ toYaml .Values.starrocksFESpec.service.annotations | indent 8 }}
-{{- end }}
-{{- end }}
+        {{- if .Values.datadog.metrics.enabled }}
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "{{.Values.starrocksFESpec.httpPort}}"
+        prometheus.io/scrape: "true"
+        {{- end }}
+        {{- if .Values.starrocksFESpec.service.annotations}}
+        {{- toYaml .Values.starrocksFESpec.service.annotations | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
     annotations:
       app.starrocks.io/fe-config-hash: {{template "starrockscluster.fe.config.hash" . }}
+      {{- if .Values.datadog.log.enabled }}
+      ad.datadoghq.com/fe.logs: '[{"source": "fe","service": "starrocks","tags": {{.Values.datadog.log.tags}}]'
+      {{- end }}
 {{- if .Values.starrocksFESpec.annotations }}
 {{ toYaml .Values.starrocksFESpec.annotations | indent 6 }}
 {{- end }}
@@ -61,8 +71,12 @@ spec:
 {{- if .Values.starrocksFESpec.schedulerName }}
     schedulerName: {{ .Values.starrocksFESpec.schedulerName }}
 {{- end }}
-{{- if or .Values.starrocksFESpec.feEnvVars .Values.initPassword.enabled }}
+{{- if or .Values.starrocksFESpec.feEnvVars .Values.initPassword.enabled .Values.datadog.log.enabled }}
     feEnvVars:
+    {{- if .Values.datadog.log.enabled }}
+      - name: LOG_CONSOLE
+        value: "1"
+    {{- end }}
     {{- if .Values.timeZone }}
       - name: TZ
         value: {{ .Values.timeZone }}
@@ -138,19 +152,29 @@ spec:
     {{- else if .Values.starrocksBeSpec.resource }}
     {{- toYaml .Values.starrocksBeSpec.resource | nindent 4 }}
     {{- end }}
-{{- if .Values.starrocksBeSpec.service.type }}
+    {{- if .Values.starrocksBeSpec.service.type }}
     service:
       type: {{ .Values.starrocksBeSpec.service.type }}
-{{- if and (eq "LoadBalancer" .Values.starrocksBeSpec.service.type) .Values.starrocksBeSpec.service.loadbalancerIP }}
+      {{- if and (eq "LoadBalancer" .Values.starrocksBeSpec.service.type) .Values.starrocksBeSpec.service.loadbalancerIP }}
       loadBalancerIP: {{ .Values.starrocksBeSpec.service.loadbalancerIP }}
-{{- end }}
-{{- if .Values.starrocksBeSpec.service.annotations }}
+      {{- end }}
+      {{- if or .Values.starrocksBeSpec.service.annotations .Values.datadog.metrics.enabled }}
       annotations:
-{{ toYaml .Values.starrocksBeSpec.service.annotations | indent 8 }}
-{{- end }}
-{{- end }}
+        {{- if .Values.datadog.metrics.enabled }}
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "{{.Values.starrocksBeSpec.webServerPort}}"
+        prometheus.io/scrape: "true"
+        {{- end }}
+        {{- if .Values.starrocksBeSpec.service.annotations }}
+        {{- toYaml .Values.starrocksBeSpec.service.annotations | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
     annotations:
       app.starrocks.io/be-config-hash: {{template "starrockscluster.be.config.hash" . }}
+      {{- if .Values.datadog.log.enabled }}
+      ad.datadoghq.com/fe.logs: '[{"source": "be","service": "starrocks","tags": {{.Values.datadog.log.tags}}]'
+      {{- end }}
 {{- if .Values.starrocksBeSpec.annotations }}
 {{ toYaml .Values.starrocksBeSpec.annotations | indent 6 }}
 {{- end }}
@@ -177,8 +201,12 @@ spec:
     nodeSelector:
 {{ toYaml .Values.starrocksBeSpec.nodeSelector | indent 6 }}
 {{- end }}
-{{- if or .Values.starrocksBeSpec.beEnvVars .Values.initPassword.enabled }}
+{{- if or .Values.starrocksBeSpec.beEnvVars .Values.initPassword.enabled .Values.datadog.log.enabled }}
     beEnvVars:
+    {{- if .Values.datadog.log.enabled }}
+      - name: LOG_CONSOLE
+        value: "1"
+    {{- end }}
     {{- if .Values.timeZone }}
       - name: TZ
         value: {{ .Values.timeZone }}
@@ -265,8 +293,12 @@ spec:
     nodeSelector:
 {{ toYaml .Values.starrocksCnSpec.nodeSelector | indent 6 }}
 {{- end }}
-{{- if or .Values.starrocksCnSpec.cnEnvVars .Values.initPassword.enabled }}
+{{- if or .Values.starrocksCnSpec.cnEnvVars .Values.initPassword.enabled .Values.datadog.log.enabled }}
     cnEnvVars:
+    {{- if .Values.datadog.log.enabled }}
+      - name: LOG_CONSOLE
+        value: "1"
+    {{- end }}
     {{- if .Values.timeZone }}
       - name: TZ
         value: {{ .Values.timeZone }}
@@ -302,19 +334,29 @@ spec:
     {{- else if .Values.starrocksCnSpec.resource }}
     {{- toYaml .Values.starrocksCnSpec.resource | nindent 4 }}
     {{- end }}
-{{- if .Values.starrocksCnSpec.service.type }}
+    {{- if .Values.starrocksCnSpec.service.type }}
     service:
       type: {{ .Values.starrocksCnSpec.service.type }}
-{{- if and (eq "LoadBalancer" .Values.starrocksCnSpec.service.type) .Values.starrocksCnSpec.service.loadbalancerIP }}
+      {{- if and (eq "LoadBalancer" .Values.starrocksCnSpec.service.type) .Values.starrocksCnSpec.service.loadbalancerIP }}
       loadBalancerIP: {{ .Values.starrocksCnSpec.service.loadbalancerIP }}
-{{- end }}
-{{- if .Values.starrocksCnSpec.service.annotations }}
+      {{- end }}
+      {{- if or .Values.starrocksCnSpec.service.annotations .Values.datadog.metrics.enabled }}
       annotations:
-{{ toYaml .Values.starrocksCnSpec.service.annotations | indent 8 }}
-{{- end }}
-{{- end }}
+        {{- if .Values.datadog.metrics.enabled }}
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "{{.Values.starrocksCnSpec.webServerPort}}"
+        prometheus.io/scrape: "true"
+        {{- end }}
+        {{- if .Values.starrocksCnSpec.service.annotations }}
+        {{- toYaml .Values.starrocksBeSpec.service.annotations | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
     annotations:
       app.starrocks.io/cn-config-hash: {{template "starrockscluster.cn.config.hash" . }}
+      {{- if .Values.datadog.log.enabled }}
+      ad.datadoghq.com/fe.logs: '[{"source": "cn","service": "starrocks","tags": {{.Values.datadog.log.tags}}]'
+      {{- end }}
 {{- if .Values.starrocksCnSpec.annotations }}
 {{ toYaml .Values.starrocksCnSpec.annotations | indent 6 }}
 {{- end }}
