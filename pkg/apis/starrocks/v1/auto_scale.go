@@ -30,7 +30,7 @@ type AutoScalingPolicy struct {
 	HPAPolicy *HPAPolicy `json:"hpaPolicy,omitempty"`
 
 	// version represents the autoscaler version for cn service. only support v1,v2beta2,v2
-	// +kubebuilder:default:="v2beta2"
+	// +optional
 	Version AutoScalerVersion `json:"version,omitempty"`
 
 	// MinReplicas is the lower limit for the number of replicas to which the autoscaler
