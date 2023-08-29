@@ -17,9 +17,11 @@ limitations under the License.
 package resource_utils
 
 import (
+	"strconv"
 	"unsafe"
 
 	srapi "github.com/StarRocks/starrocks-kubernetes-operator/pkg/apis/starrocks/v1"
+	"github.com/StarRocks/starrocks-kubernetes-operator/pkg/k8sutils"
 	appv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/autoscaling/v1"
 	v2 "k8s.io/api/autoscaling/v2"
@@ -48,11 +50,22 @@ func BuildHorizontalPodAutoscaler(pap *PodAutoscalerParams) client.Object {
 	switch pap.AutoscalerType {
 	case srapi.AutoScalerV1:
 		return buildAutoscalerV1(pap)
-	case srapi.AutoSclaerV2:
+	case srapi.AutoScalerV2:
 		return buildAutoscalerV2(pap)
-	default:
-		return buildAutoscalerV2beta2(pap)
 	}
+
+	// operator choose a proper default hpa version by checking ths kubernetes version
+	// if kubernetes version > 1.25, use v2 version
+	if k8sutils.KUBE_MAJOR_VERSION == "1" {
+		minor, err := strconv.Atoi(k8sutils.KUBE_MINOR_VERSION)
+		if err != nil {
+			return buildAutoscalerV2beta2(pap)
+		}
+		if minor > 25 {
+			return buildAutoscalerV2(pap)
+		}
+	}
+	return buildAutoscalerV2beta2(pap)
 }
 
 // build v1 autoscaler
