@@ -49,6 +49,11 @@ type StarRocksComponentSpec struct {
 	// Defaults to 120 seconds.
 	// +optional
 	TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds,omitempty"`
+
+	// PreStartScriptLocation is the location of the pre-start script. It will be executed before the starrocks process
+	// starts. If the script exits with a non-zero exit code, the pod will be marked as failed.
+	// +optional
+	PreStartScriptLocation string `json:"preStartScriptLocation,omitempty"`
 }
 
 // StarRocksComponentStatus represents the status of a starrocks component.
@@ -124,4 +129,8 @@ func (spec *StarRocksComponentSpec) GetTerminationGracePeriodSeconds() *int64 {
 		return &defaultSeconds
 	}
 	return spec.TerminationGracePeriodSeconds
+}
+
+func (spec *StarRocksComponentSpec) GetPreStartScriptLocation() string {
+	return spec.PreStartScriptLocation
 }
