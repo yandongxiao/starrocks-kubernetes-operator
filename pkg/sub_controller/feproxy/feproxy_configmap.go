@@ -59,7 +59,7 @@ http {
   sendfile            on;
   tcp_nopush          on;
   tcp_nodelay         on;
-  keepalive_timeout   0;
+  keepalive_timeout   75s 74s;
   types_hash_max_size 2048;
   client_max_body_size 0;
   ignore_invalid_headers off;
