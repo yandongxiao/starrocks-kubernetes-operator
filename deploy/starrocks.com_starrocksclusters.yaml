@@ -18,14 +18,20 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
     - jsonPath: .status.starRocksFeStatus.phase
       name: FeStatus
+      type: string
+    - jsonPath: .status.starRocksBeStatus.phase
+      name: BeStatus
       type: string
     - jsonPath: .status.starRocksCnStatus.phase
       name: CnStatus
       type: string
-    - jsonPath: .status.starRocksBeStatus.phase
-      name: BeStatus
+    - jsonPath: .status.starRocksFeProxyStatus.phase
+      name: FeProxyStatus
       type: string
     name: v1
     schema:
@@ -518,6 +524,8 @@ spec:
                     additionalProperties:
                       type: string
                     type: object
+                  preStartScriptLocation:
+                    type: string
                   readinessProbeFailureSeconds:
                     format: int32
                     type: integer
@@ -598,8 +606,8 @@ spec:
                         subPath:
                           type: string
                       required:
+                      - mountPath
                       - name
-                      - storageSize
                       type: object
                     type: array
                   terminationGracePeriodSeconds:
@@ -1427,6 +1435,8 @@ spec:
                     additionalProperties:
                       type: string
                     type: object
+                  preStartScriptLocation:
+                    type: string
                   readinessProbeFailureSeconds:
                     format: int32
                     type: integer
@@ -1507,8 +1517,8 @@ spec:
                         subPath:
                           type: string
                       required:
+                      - mountPath
                       - name
-                      - storageSize
                       type: object
                     type: array
                   terminationGracePeriodSeconds:
@@ -1995,8 +2005,8 @@ spec:
                         subPath:
                           type: string
                       required:
+                      - mountPath
                       - name
-                      - storageSize
                       type: object
                     type: array
                   tolerations:
@@ -2493,6 +2503,8 @@ spec:
                     additionalProperties:
                       type: string
                     type: object
+                  preStartScriptLocation:
+                    type: string
                   readinessProbeFailureSeconds:
                     format: int32
                     type: integer
@@ -2573,8 +2585,8 @@ spec:
                         subPath:
                           type: string
                       required:
+                      - mountPath
                       - name
-                      - storageSize
                       type: object
                     type: array
                   terminationGracePeriodSeconds:
@@ -2601,6 +2613,8 @@ spec:
           status:
             properties:
               phase:
+                type: string
+              reason:
                 type: string
               starRocksBeStatus:
                 properties:

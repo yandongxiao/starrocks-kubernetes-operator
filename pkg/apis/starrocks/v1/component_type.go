@@ -49,6 +49,11 @@ type StarRocksComponentSpec struct {
 	// Defaults to 120 seconds.
 	// +optional
 	TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds,omitempty"`
+
+	// PreStartScriptLocation is the location of the pre-start script. It will be executed before the starrocks process
+	// starts. If the script exits with a non-zero exit code, the pod will be marked as failed.
+	// +optional
+	PreStartScriptLocation string `json:"preStartScriptLocation,omitempty"`
 }
 
 // StarRocksComponentStatus represents the status of a starrocks component.
@@ -65,12 +70,12 @@ type StarRocksComponentStatus struct {
 	// RunningInstances in running status pod names.
 	RunningInstances []string `json:"runningInstances,omitempty"`
 
-	// ResourceNames the statefulset names of fe in v1alpha1 version.
+	// ResourceNames the statefulset names of fe.
 	ResourceNames []string `json:"resourceNames,omitempty"`
 
 	// Phase the value from all pods of component status. If component have one failed pod phase=failed,
 	// also if fe have one creating pod phase=creating, also if component all running phase=running, others unknown.
-	Phase MemberPhase `json:"phase"`
+	Phase ComponentPhase `json:"phase"`
 
 	// +optional
 	// Reason represents the reason of not running.
@@ -124,4 +129,8 @@ func (spec *StarRocksComponentSpec) GetTerminationGracePeriodSeconds() *int64 {
 		return &defaultSeconds
 	}
 	return spec.TerminationGracePeriodSeconds
+}
+
+func (spec *StarRocksComponentSpec) GetPreStartScriptLocation() string {
+	return spec.PreStartScriptLocation
 }
