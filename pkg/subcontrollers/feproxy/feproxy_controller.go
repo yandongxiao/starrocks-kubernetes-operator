@@ -151,7 +151,7 @@ func (controller *FeProxyController) UpdateClusterStatus(ctx context.Context, sr
 	}
 
 	status.ServiceName = service.ExternalServiceName(src.Name, feProxySpec)
-	if err := subcontrollers.UpdateStatus(&status.StarRocksComponentStatus, controller.k8sClient,
+	if err := subcontrollers.UpdateStatus(ctx, &status.StarRocksComponentStatus, controller.k8sClient,
 		src.Namespace, load.Name(src.Name, feProxySpec), pod.Labels(src.Name, feProxySpec), subcontrollers.DeploymentLoadType); err != nil {
 		logger.Error(err, "update fe proxy status failed", "StarRocksCluster", src)
 		return err

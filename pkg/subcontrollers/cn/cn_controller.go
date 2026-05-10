@@ -327,7 +327,7 @@ func (cc *CnController) UpdateStatus(ctx context.Context, object object.StarRock
 	}
 	cnStatus.Selector = selector.String()
 
-	if err := subc.UpdateStatus(&cnStatus.StarRocksComponentStatus, cc.k8sClient,
+	if err := subc.UpdateStatus(ctx, &cnStatus.StarRocksComponentStatus, cc.k8sClient,
 		object.Namespace, load.Name(object.SubResourcePrefixName, cnSpec),
 		pod.Labels(object.SubResourcePrefixName, cnSpec), subc.StatefulSetLoadType); err != nil {
 		return err

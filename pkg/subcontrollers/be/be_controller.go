@@ -183,7 +183,7 @@ func (be *BeController) UpdateClusterStatus(ctx context.Context, src *srapi.Star
 	bs.ServiceName = service.ExternalServiceName(src.Name, beSpec)
 	bs.ResourceNames = rutils.MergeSlices(bs.ResourceNames, []string{statefulSetName})
 
-	if err := subc.UpdateStatus(&bs.StarRocksComponentStatus, be.Client,
+	if err := subc.UpdateStatus(ctx, &bs.StarRocksComponentStatus, be.Client,
 		src.Namespace, load.Name(src.Name, beSpec), pod.Labels(src.Name, beSpec), subc.StatefulSetLoadType); err != nil {
 		return err
 	}

@@ -146,7 +146,7 @@ func (fc *FeController) SyncCluster(ctx context.Context, src *srapi.StarRocksClu
 }
 
 // UpdateClusterStatus update the all resource status about fe.
-func (fc *FeController) UpdateClusterStatus(_ context.Context, src *srapi.StarRocksCluster) error {
+func (fc *FeController) UpdateClusterStatus(ctx context.Context, src *srapi.StarRocksCluster) error {
 	// if spec is not exist, status is empty. but before clear status we must clear all resource about be used by ClearCluster.
 	feSpec := src.Spec.StarRocksFeSpec
 	if feSpec == nil {
@@ -169,7 +169,7 @@ func (fc *FeController) UpdateClusterStatus(_ context.Context, src *srapi.StarRo
 	statefulSetName := load.Name(src.Name, src.Spec.StarRocksFeSpec)
 	fs.ResourceNames = rutils.MergeSlices(fs.ResourceNames, []string{statefulSetName})
 
-	if err := subcontrollers.UpdateStatus(&fs.StarRocksComponentStatus, fc.Client,
+	if err := subcontrollers.UpdateStatus(ctx, &fs.StarRocksComponentStatus, fc.Client,
 		src.Namespace, load.Name(src.Name, feSpec), pod.Labels(src.Name, feSpec), subcontrollers.StatefulSetLoadType); err != nil {
 		return err
 	}

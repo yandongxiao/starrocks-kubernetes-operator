@@ -68,10 +68,8 @@ const (
 	StatefulSetLoadType = "StatefulSet"
 )
 
-func UpdateStatus(componentStatus *srapi.StarRocksComponentStatus, k8sClient client.Client,
+func UpdateStatus(ctx context.Context, componentStatus *srapi.StarRocksComponentStatus, k8sClient client.Client,
 	namespace string, name string, podLabels map[string]string, loadType LoadType) error {
-	ctx := context.TODO()
-
 	var podList corev1.PodList
 	if err := k8sClient.List(ctx, &podList, client.InNamespace(namespace), client.MatchingLabels(podLabels)); err != nil {
 		return err
